@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment target'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+
+jobs:
+  ci:
+    uses: UriesmoothTech/.github/.github/workflows/ci-reusable.yml@main
+    with:
+      project_type: static
+      environment: ${{ inputs.environment || 'staging' }}
+      deploy: ${{ github.event_name == 'workflow_dispatch' }}
+    secrets:
+      deploy-token: ${{ secrets.VERCEL_TOKEN }}
+      vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+      vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+
